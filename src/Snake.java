@@ -8,12 +8,12 @@ import javax.swing.*;
 
 public class Snake implements Runnable
 {
-    public char direction = 'a';
-    public int[] xArray;
-    public int[] yArray;
-    public int size;
-    boolean gameOver = false;
-    public Timer snakeTimer;
+    char direction = 'a';
+    private int[] xArray;
+    private int[] yArray;
+    private int initialSize;
+    private boolean gameOver = false;
+    Timer snakeTimer;
 
     Snake()
     {
@@ -32,7 +32,7 @@ public class Snake implements Runnable
         yArray[3] = 250;
 
 
-        size = 4;
+        initialSize = 10;
     }
 
     // Draws the snake onto the screen
@@ -42,9 +42,9 @@ public class Snake implements Runnable
         if(!gameOver)
         {
             g2.setColor(Color.GREEN);
-            for(int i = 0; i < size; i++)
+            for(int i = 0; i < initialSize; i++)
             {
-                g2.fillRect(xArray[i], yArray[i], 10, 10);
+                g2.fillOval(xArray[i], yArray[i], 10, 10);
             }
         }
         else
@@ -56,7 +56,7 @@ public class Snake implements Runnable
     {
         if(direction == 'a')
         {
-            for( int i = size - 1; i > 0; i--)
+            for(int i = initialSize - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
@@ -67,7 +67,7 @@ public class Snake implements Runnable
 
         if(direction == 's')
         {
-            for(int i = size - 1; i > 0; i--)
+            for(int i = initialSize - 1; i > 0; i--)
         {
             xArray[i] = xArray[i - 1];
             yArray[i] = yArray[i - 1];
@@ -78,7 +78,7 @@ public class Snake implements Runnable
 
         if(direction == 'd')
         {
-            for(int i = size - 1; i > 0; i--)
+            for(int i = initialSize - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
@@ -89,7 +89,7 @@ public class Snake implements Runnable
 
         if(direction == 'w')
         {
-            for(int i = size - 1; i > 0; i--)
+            for(int i = initialSize - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
