@@ -16,8 +16,10 @@ public class Board extends JPanel implements KeyListener
     private JFrame gameFrame = new JFrame();
     private final int WINDOW_WIDTH = 700;
     private final int WINDOW_HEIGHT = 550;
-    private int speed = 100;
+    private int speed = 50;
     private int score;
+    private int x = 10*(int)((50-5)*Math.random()+5), y =10*(int)((40-5)*Math.random()+5);
+
 
     Board()
     {
@@ -87,6 +89,9 @@ public class Board extends JPanel implements KeyListener
 
         // Draw the snake
         gameSnake.drawSnake(graphics2D);
+
+        // Spawn the food
+        spawnFood(graphics2D);
     }
 
     private Action reDrawSnake = new AbstractAction() {
@@ -94,6 +99,18 @@ public class Board extends JPanel implements KeyListener
             repaint();
         }
     };
+
+    public void spawnFood(Graphics g)
+    {
+        drawFood(x, y, g);
+    }
+
+    public void drawFood(int x, int y, Graphics g)
+    {
+        Graphics2D graphics2D = (Graphics2D)g;
+        graphics2D.setColor(Color.RED);
+        graphics2D.fillOval(x, y, 10, 10);
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {
