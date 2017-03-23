@@ -32,7 +32,7 @@ public class Snake implements Runnable
         yArray[3] = 250;
 
 
-        initialSize = 10;
+        initialSize = 3;
     }
 
     // Draws the snake onto the screen
