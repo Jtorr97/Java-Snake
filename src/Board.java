@@ -8,15 +8,19 @@ import java.awt.event.*;
 import java.awt.*;
 import java.io.*;
 
-public class Board extends JPanel implements KeyListener
+public class Board extends JPanel
 {
     private volatile Snake gameSnake = new Snake();
     private JFrame gameFrame = new JFrame();
-    private final int WINDOW_WIDTH = 700;
-    private final int WINDOW_HEIGHT = 550;
-    private int speed = 70;
+    private InputHandler inputHandler = new InputHandler();
+    private Font font1;
+    private Font font2;
+
+    private final int speed = 70;
+
     private int score;
     private int x = 10*(int)((50-5)*Math.random()+5), y =10*(int)((40-5)*Math.random()+5);
+
     private boolean isPaused;
     private boolean gameStarted = false;
 
@@ -24,15 +28,38 @@ public class Board extends JPanel implements KeyListener
 
     Board()
     {
+        initGUI();
+
+        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+    }
+
+    public void initGUI()
+    {
         // Create the main window
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        gameFrame.addKeyListener(this);
+        gameFrame.addKeyListener(inputHandler);
         gameFrame.setTitle("Snake");
-        gameFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        gameFrame.setSize(700, 550);
         gameFrame.setResizable(false);
         gameFrame.add(this);
         JMenuBar bar = new JMenuBar();
         JMenu gameMenu = new JMenu("Game");
+
+        // Initialize fonts
+        try {
+            // Create the font to use. Specify the size!
+            font1 = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/8-BIT WONDER.TTF")).deriveFont(40f);
+            font2 = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/thin_pixel-7.ttf")).deriveFont(35f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+            // Register the font
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts/8-BIT WONDER.TTF")));
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts/thin_pixel-7.ttf")));
+
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            System.out.println("Error: Font not found.");
+        }
 
         // New game button
         JMenuItem newgame = new JMenuItem("New Game");
@@ -63,7 +90,7 @@ public class Board extends JPanel implements KeyListener
         about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(frame, "Snake version " + VERSION +
-                        "\nwritten by Joshua Torres.\nVictoria College\nCOSC 1436 Spring 2017 Final Project\n"
+                                "\nwritten by Joshua Torres.\nVictoria College\nCOSC 1436 Spring 2017 Final Project\n"
                         , "About", JOptionPane.PLAIN_MESSAGE);
             }
         });
@@ -76,8 +103,6 @@ public class Board extends JPanel implements KeyListener
         bar.add(helpMenu);
         gameFrame.setJMenuBar(bar);
         gameFrame.setVisible(true);
-
-        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
     }
 
     public void paint(Graphics g)
@@ -88,55 +113,39 @@ public class Board extends JPanel implements KeyListener
         graphics2D.setColor(Color.white);
         graphics2D.fillRect(0,0,700,500);
 
-        try {
-            //create the font to use. Specify the size!
-            Font titleFont = Font.createFont(Font.TRUETYPE_FONT, new File("fonts\\8-BIT WONDER.TTF")).deriveFont(40f);
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            //register the font
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts\\8-BIT WONDER.TTF")));
+        // Title text
+        graphics2D.setFont(font1);
+        graphics2D.setColor(Color.BLACK);
+        graphics2D.drawString("Snake", 50, 40);
 
-            // Title text
-            graphics2D.setFont(titleFont);
-            graphics2D.setColor(Color.BLACK);
-            graphics2D.drawString("Snake", 50, 40);
+        // Score box/text
+        graphics2D.setFont(font2);
+        graphics2D.setColor(Color.RED);
+        graphics2D.drawRect(49, 49, 501, 401);
+        graphics2D.setColor(Color.BLACK);
+        graphics2D.fillRect(50, 50, 500, 400);
+        graphics2D.drawRect(560, 50, 125, 40);
+        graphics2D.drawString("Score: " + score, 565, 75);
 
-            //create the font to use. Specify the size!
-            Font scoreFont = Font.createFont(Font.TRUETYPE_FONT, new File("fonts\\thin_pixel-7.ttf")).deriveFont(35f);
-            //register the font
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts\\thin_pixel-7.ttf")));
+        // Pause screen
+        if(isPaused)
+        {
+            graphics2D.setFont(font2.deriveFont(Font.BOLD));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString("Paused - Press 'c' to continue",150,200);
+            gameSnake.snakeTimer.stop();
+        }
+        else
+        {
+            gameSnake.snakeTimer.restart();
+        }
 
-            // Score box/text
-            graphics2D.setFont(scoreFont);
-            graphics2D.setColor(Color.RED);
-            graphics2D.drawRect(49, 49, 501, 401);
-            graphics2D.setColor(Color.BLACK);
-            graphics2D.fillRect(50, 50, 500, 400);
-            graphics2D.drawRect(560, 50, 125, 40);
-            graphics2D.drawString("Score: " + score, 565, 75);
-
-            // Pause screen
-            if(isPaused)
-            {
-                graphics2D.setFont(scoreFont.deriveFont(Font.BOLD));
-                graphics2D.setColor(Color.WHITE);
-                graphics2D.drawString("Paused - Press 'c' to continue",150,200);
-                gameSnake.snakeTimer.stop();
-            }
-            else
-            {
-                gameSnake.snakeTimer.restart();
-            }
-
-            if(!gameStarted)
-            {
-                graphics2D.setFont(scoreFont.deriveFont(Font.BOLD));
-                graphics2D.setColor(Color.WHITE);
-                graphics2D.drawString("Press Enter to start!", 200, 200);
-                gameSnake.snakeTimer.stop();
-            }
-
-        } catch (IOException | FontFormatException e) {
-            e.printStackTrace();
+        if(!gameStarted)
+        {
+            graphics2D.setFont(font2.deriveFont(Font.BOLD));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString("Press Enter to start!", 200, 200);
+            gameSnake.snakeTimer.stop();
         }
 
         // Draw the snake
@@ -164,113 +173,127 @@ public class Board extends JPanel implements KeyListener
         graphics2D.fillOval(x, y, 10, 10);
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
+    //***************************************************************
+    // Handle various input for the program
+    //***************************************************************
 
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e)
+    public class InputHandler implements KeyListener
     {
-        // Handle input: Use arrow keys to move the snake
-        switch(e.getKeyCode()) {
-            case KeyEvent.VK_LEFT:
-            {
-                if(gameSnake.direction == 'a')
+        @Override
+        public void keyTyped(KeyEvent e) {}
+
+        @Override
+        public void keyPressed(KeyEvent e)
+        {
+            // Handle input: Use arrow keys to move the snake
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_LEFT:
+                {
+                    if(gameSnake.direction == 'a')
+                        break;
+                    if(gameSnake.direction != 'd') {
+                        gameSnake.snakeTimer.stop();
+                        gameSnake.direction = 'a';
+                        repaint();
+                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+                        gameSnake.snakeTimer.start();
+                    }
                     break;
-                if(gameSnake.direction != 'd') {
-                    gameSnake.snakeTimer.stop();
-                    gameSnake.direction = 'a';
-                    repaint();
-                    gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                    gameSnake.snakeTimer.start();
                 }
-                break;
-            }
 
-            case KeyEvent.VK_DOWN:
-            {
-                if(gameSnake.direction == 's')
+                case KeyEvent.VK_DOWN:
+                {
+                    if(gameSnake.direction == 's')
+                        break;
+                    if(gameSnake.direction != 'w') {
+                        gameSnake.snakeTimer.stop();
+                        gameSnake.direction = 's';
+                        repaint();
+                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+                        gameSnake.snakeTimer.start();
+                    }
                     break;
-                if(gameSnake.direction != 'w') {
-                    gameSnake.snakeTimer.stop();
-                    gameSnake.direction = 's';
-                    repaint();
-                    gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                    gameSnake.snakeTimer.start();
                 }
-                break;
-            }
 
-            case KeyEvent.VK_UP:
-            {
-                if(gameSnake.direction == 'w')
+                case KeyEvent.VK_UP:
+                {
+                    if(gameSnake.direction == 'w')
+                        break;
+                    if(gameSnake.direction != 's') {
+                        gameSnake.snakeTimer.stop();
+                        gameSnake.direction = 'w';
+                        repaint();
+                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+                        gameSnake.snakeTimer.start();
+                    }
                     break;
-                if(gameSnake.direction != 's') {
-                    gameSnake.snakeTimer.stop();
-                    gameSnake.direction = 'w';
-                    repaint();
-                    gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                    gameSnake.snakeTimer.start();
+
                 }
-                break;
 
-            }
-
-            // Press enter to start the game
-            case KeyEvent.VK_ENTER:
-            {
-                gameStarted = true;
-                gameSnake.snakeTimer.start();
-                break;
-            }
-
-            // 'p' pressed, pause game
-            case KeyEvent.VK_P:
-            {
-                isPaused = true;
-                break;
-            }
-
-            // 'c' pressed, continue game
-            case KeyEvent.VK_C:
-            {
-                isPaused = false;
-                repaint();
-                break;
-            }
-
-            // Esc pressed to exit and close window
-            case KeyEvent.VK_ESCAPE:
-            {
-                System.exit(0);
-            }
-
-            case KeyEvent.VK_N:
-            {
-                gameFrame.dispose();
-                Board board = new Board();
-                break;
-            }
-
-            case KeyEvent.VK_RIGHT:
-            {
-                if(gameSnake.direction == 'd')
+                // Press enter to start the game
+                case KeyEvent.VK_ENTER:
+                {
+                    gameStarted = true;
+                    gameSnake.snakeTimer.start();
                     break;
-                if(gameSnake.direction != 'a') {
-                    gameSnake.snakeTimer.stop();
-                    gameSnake.direction = 'd';
-                    repaint();
-                    gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                    gameSnake.snakeTimer.start();
                 }
-                break;
+
+                // 'p' pressed, pause game
+                case KeyEvent.VK_P:
+                {
+                    isPaused = true;
+                    break;
+                }
+
+                // 'c' pressed, continue game
+                case KeyEvent.VK_C:
+                {
+                    isPaused = false;
+                    repaint();
+                    break;
+                }
+
+                // Esc pressed to exit and close window
+                case KeyEvent.VK_ESCAPE:
+                {
+                    System.exit(0);
+                }
+
+                case KeyEvent.VK_N:
+                {
+                    gameFrame.dispose();
+                    Board board = new Board();
+                    break;
+                }
+
+                case KeyEvent.VK_RIGHT:
+                {
+                    if(gameSnake.direction == 'd')
+                        break;
+                    if(gameSnake.direction != 'a') {
+                        gameSnake.snakeTimer.stop();
+                        gameSnake.direction = 'd';
+                        repaint();
+                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+                        gameSnake.snakeTimer.start();
+                    }
+                    break;
+                }
             }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+
         }
     }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
+    //***************************************************************
+    // Main method
+    //***************************************************************
 
+    public static void main(String[] args)
+    {
+        Board b = new Board();
     }
 }
