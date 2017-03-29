@@ -3,6 +3,9 @@
 // Board.java
 //
 
+import javafx.beans.property.adapter.JavaBeanObjectProperty;
+import jdk.nashorn.internal.scripts.JO;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -10,30 +13,47 @@ import java.io.*;
 
 public class Board extends JPanel
 {
+    // Snake object
     private volatile Snake gameSnake = new Snake();
+
+    // Main game frame
     private JFrame gameFrame = new JFrame();
+
+    // InputHandler object
     private InputHandler inputHandler = new InputHandler();
+
+    // Custom fonts used for this program
     private Font font1;
     private Font font2;
 
+    // Speed of which the snakes moves at, lower = faster
     private final int speed = 70;
 
+    // The game score
     private int score;
+
+    // Random x and y coordinates for the food spawn location
     private int x = 10*(int)((50-5)*Math.random()+5), y =10*(int)((40-5)*Math.random()+5);
 
+    // If the game is paused or not
     private boolean isPaused;
+
+    // If the game has started or not
     private boolean gameStarted = false;
 
+    // App version
     private final double VERSION = 1.0;
 
-    Board()
+    // Default constructor
+    private Board()
     {
         initGUI();
 
         gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
     }
 
-    public void initGUI()
+    // Initialize various elements for the game's GUI
+    private void initGUI()
     {
         // Create the main window
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -48,13 +68,13 @@ public class Board extends JPanel
         // Initialize fonts
         try {
             // Create the font to use. Specify the size!
-            font1 = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/8-BIT WONDER.TTF")).deriveFont(40f);
-            font2 = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/thin_pixel-7.ttf")).deriveFont(35f);
+            font1 = Font.createFont(Font.TRUETYPE_FONT, new File("src/fonts/8-BIT WONDER.TTF")).deriveFont(40f);
+            font2 = Font.createFont(Font.TRUETYPE_FONT, new File("src/fonts/thin_pixel-7.ttf")).deriveFont(35f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
             // Register the font
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts/8-BIT WONDER.TTF")));
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("fonts/thin_pixel-7.ttf")));
+            ge.registerFont(font1);
+            ge.registerFont(font2);
 
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
@@ -65,8 +85,7 @@ public class Board extends JPanel
         JMenuItem newgame = new JMenuItem("New Game");
         newgame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                gameFrame.dispose();
-                Board board = new Board();
+                restartGame();
             }
         } );
 
@@ -75,10 +94,11 @@ public class Board extends JPanel
 
         // Various other buttons
         JMenu helpMenu = new JMenu("Help");
-        JMenuItem controls = new JMenuItem ("How to play");
+        JMenuItem howToPlay = new JMenuItem ("How to play");
+        JMenuItem controls = new JMenuItem("Controls");
         JMenuItem about = new JMenuItem("About");
 
-        controls.addActionListener(new ActionListener() {
+        howToPlay.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 JOptionPane.showMessageDialog(frame, "To play the game use the arrow keys to move the snake" +
                                 " around and eat the apples." +
@@ -87,24 +107,52 @@ public class Board extends JPanel
                         "How to play",JOptionPane.INFORMATION_MESSAGE);
             }
         });
+        controls.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(frame,
+                        "Up Key: Move Up\n" +
+                        "Left Key: Move Left\n" +
+                        "Right Key: Move Right\n" +
+                                "Down Key: Move Down\n" +
+                                "'n': New Game\n" +
+                                "'p': Pause Screen\n" +
+                                "'c': Exit Pause Screen\n" +
+                                "Esc: Close window","Controls", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Snake version " + VERSION +
-                                "\nwritten by Joshua Torres.\nVictoria College\nCOSC 1436 Spring 2017 Final Project\n"
+                JOptionPane.showMessageDialog(frame, "Snake: version " + VERSION +
+                                "\nwritten by Joshua Torres.\n" +
+                                "Victoria College\n" +
+                                "COSC 1436 Spring 2017 Final Project\n"
                         , "About", JOptionPane.PLAIN_MESSAGE);
             }
         });
 
+        // Add helpmenu elements
+        helpMenu.add(howToPlay);
         helpMenu.add(controls);
         helpMenu.add(about);
+
+        // Add gamemenu elements
         gameMenu.add(newgame);
 
+        // Add game and help menu bar
         bar.add(gameMenu);
         bar.add(helpMenu);
         gameFrame.setJMenuBar(bar);
         gameFrame.setVisible(true);
     }
 
+    private void restartGame()
+    {
+        gameFrame.dispose();
+        new Board();
+    }
+
+    // Paint component
     public void paint(Graphics g)
     {
         // The game board and window
@@ -144,8 +192,11 @@ public class Board extends JPanel
         {
             graphics2D.setFont(font2.deriveFont(Font.BOLD));
             graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("Press Enter to start!", 200, 200);
-            gameSnake.snakeTimer.stop();
+            graphics2D.drawString("Press the up or down key to start!", 120, 200);
+        }
+        else
+        {
+            gameSnake.snakeTimer.restart();
         }
 
         // Draw the snake
@@ -201,6 +252,20 @@ public class Board extends JPanel
                     break;
                 }
 
+                case KeyEvent.VK_RIGHT:
+                {
+                    if(gameSnake.direction == 'd')
+                        break;
+                    if(gameSnake.direction != 'a') {
+                        gameSnake.snakeTimer.stop();
+                        gameSnake.direction = 'd';
+                        repaint();
+                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+                        gameSnake.snakeTimer.start();
+                    }
+                    break;
+                }
+
                 case KeyEvent.VK_DOWN:
                 {
                     if(gameSnake.direction == 's')
@@ -230,11 +295,10 @@ public class Board extends JPanel
 
                 }
 
-                // Press enter to start the game
                 case KeyEvent.VK_ENTER:
                 {
+                    gameSnake.direction = 'a';
                     gameStarted = true;
-                    gameSnake.snakeTimer.start();
                     break;
                 }
 
@@ -261,22 +325,7 @@ public class Board extends JPanel
 
                 case KeyEvent.VK_N:
                 {
-                    gameFrame.dispose();
-                    Board board = new Board();
-                    break;
-                }
-
-                case KeyEvent.VK_RIGHT:
-                {
-                    if(gameSnake.direction == 'd')
-                        break;
-                    if(gameSnake.direction != 'a') {
-                        gameSnake.snakeTimer.stop();
-                        gameSnake.direction = 'd';
-                        repaint();
-                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                        gameSnake.snakeTimer.start();
-                    }
+                    restartGame();
                     break;
                 }
             }
@@ -294,6 +343,6 @@ public class Board extends JPanel
 
     public static void main(String[] args)
     {
-        Board b = new Board();
+       new Board();
     }
 }
