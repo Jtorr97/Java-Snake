@@ -12,11 +12,11 @@ public class Snake implements Runnable
     char direction;
 
     // Stores x and y coordinates
-    private int[] xArray;
-    private int[] yArray;
+    public int[] xArray;
+    public int[] yArray;
 
-    // Snake's initial size
-    private int initialSize;
+    // Snake's size
+    private int size;
 
     // Max Snake size
     private int MAX_LENGTH = 560;
@@ -45,9 +45,23 @@ public class Snake implements Runnable
         yArray[3] = 220;
 
         // Initial snake size
-        initialSize = 4;
+        setSize(4);
     }
 
+    public void setSize(int size)
+    {
+        this.size = size;
+    }
+
+    public int getSize()
+    {
+        return size;
+    }
+
+    public void updateSize()
+    {
+        size++;
+    }
     // Draws the snake onto the screen
     public void drawSnake(Graphics2D g)
     {
@@ -56,9 +70,9 @@ public class Snake implements Runnable
         if(!gameOver)
         {
             g.setColor(Color.GREEN);
-            for(int i = 0; i < initialSize; i++)
+            for(int i = 0; i < size; i++)
             {
-                System.out.println("X pos: " + xArray[0] + " Y pos: " + yArray[0]);
+                //System.out.println("X pos: " + xArray[0] + " Y pos: " + yArray[0]);
 
                 final int PIXEL_WIDTH = 10;
                 final int PIXEL_HEIGHT = 10;
@@ -74,7 +88,7 @@ public class Snake implements Runnable
     {
         if(direction == 'a')
         {
-            for(int i = initialSize - 1; i > 0; i--)
+            for(int i = size - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
@@ -85,7 +99,7 @@ public class Snake implements Runnable
 
         if(direction == 's')
         {
-            for(int i = initialSize - 1; i > 0; i--)
+            for(int i = size - 1; i > 0; i--)
         {
             xArray[i] = xArray[i - 1];
             yArray[i] = yArray[i - 1];
@@ -96,7 +110,7 @@ public class Snake implements Runnable
 
         if(direction == 'd')
         {
-            for(int i = initialSize - 1; i > 0; i--)
+            for(int i = size - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
@@ -107,7 +121,7 @@ public class Snake implements Runnable
 
         if(direction == 'w')
         {
-            for(int i = initialSize - 1; i > 0; i--)
+            for(int i = size - 1; i > 0; i--)
             {
                 xArray[i] = xArray[i - 1];
                 yArray[i] = yArray[i - 1];
@@ -129,7 +143,7 @@ public class Snake implements Runnable
             gameOver = true;
 
         // If the snake collides with itself
-        for(int i = 1; i < initialSize; i++)
+        for(int i = 1; i < size; i++)
         {
             if(xArray[0] == xArray[i] && yArray[0] == yArray[i])
                 gameOver = true;
@@ -150,12 +164,19 @@ public class Snake implements Runnable
             }
 
             snakeTimer.stop();
+            // Game over text
             g2d.setFont(new Font("Arial Black", Font.BOLD, 40));
             g2d.setStroke(new BasicStroke(3));
             g2d.setColor(Color.BLACK);
             g2d.fillRect(50,50,500,400);
             g2d.setColor(Color.WHITE);
             g2d.drawString(text, 174, 250);
+
+            // Try again text
+            g2d.setFont(new Font("Arial",Font.PLAIN, 20));
+            g2d.setStroke(new BasicStroke(1));
+            g2d.setColor(Color.WHITE);
+            g2d.drawString("Press 'n' to play again", 205, 275);
         }
     }
 

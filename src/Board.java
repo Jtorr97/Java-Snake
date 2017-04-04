@@ -3,9 +3,6 @@
 // Board.java
 //
 
-import javafx.beans.property.adapter.JavaBeanObjectProperty;
-import jdk.nashorn.internal.scripts.JO;
-
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -14,7 +11,7 @@ import java.io.*;
 public class Board extends JPanel
 {
     // Snake object
-    private volatile Snake gameSnake = new Snake();
+    private volatile Snake snake = new Snake();
 
     // Main game frame
     private JFrame gameFrame = new JFrame();
@@ -27,16 +24,13 @@ public class Board extends JPanel
     private Font font2;
 
     // Speed of which the snakes moves at, lower = faster
-    private final int speed = 70;
+    private final int speed = 60;
 
     // The game score
     private int score;
 
     // Random x and y coordinates for the food spawn location
     private int x = 10*(int)((50-5)*Math.random()+5), y =10*(int)((40-5)*Math.random()+5);
-
-    // If the game is paused or not
-    private boolean isPaused;
 
     // If the game has started or not
     private boolean gameStarted = false;
@@ -49,7 +43,7 @@ public class Board extends JPanel
     {
         initGUI();
 
-        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
+        snake.snakeTimer = new Timer(speed, reDrawSnake);
     }
 
     // Initialize various elements for the game's GUI
@@ -83,11 +77,7 @@ public class Board extends JPanel
 
         // New game button
         JMenuItem newgame = new JMenuItem("New Game");
-        newgame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                restartGame();
-            }
-        } );
+        newgame.addActionListener(e -> restartGame());
 
         // create a jframe
         JFrame frame = new JFrame("Example");
@@ -98,38 +88,25 @@ public class Board extends JPanel
         JMenuItem controls = new JMenuItem("Controls");
         JMenuItem about = new JMenuItem("About");
 
-        howToPlay.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                JOptionPane.showMessageDialog(frame, "To play the game use the arrow keys to move the snake" +
-                                " around and eat the apples." +
-                                " \nThe bigger your snake the higher your score! " +
-                                "\nWatch out for walls and your tail, hit these and the game is over!",
-                        "How to play",JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        controls.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame,
-                        "Up Key: Move Up\n" +
-                        "Left Key: Move Left\n" +
-                        "Right Key: Move Right\n" +
-                                "Down Key: Move Down\n" +
-                                "'n': New Game\n" +
-                                "'p': Pause Screen\n" +
-                                "'c': Exit Pause Screen\n" +
-                                "Esc: Close window","Controls", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        about.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Snake: version " + VERSION +
-                                "\nwritten by Joshua Torres.\n" +
-                                "Victoria College\n" +
-                                "COSC 1436 Spring 2017 Final Project\n"
-                        , "About", JOptionPane.PLAIN_MESSAGE);
-            }
-        });
+        howToPlay.addActionListener(e -> JOptionPane.showMessageDialog(frame, "To play the game use the arrow keys to move the snake" +
+                        " around and eat the apples." +
+                        " \nThe bigger your snake the higher your score! " +
+                        "\nWatch out for walls and your tail, hit these and the game is over!",
+                "How to play",JOptionPane.INFORMATION_MESSAGE));
+        controls.addActionListener(e -> JOptionPane.showMessageDialog(frame,
+                "Up Key: Move Up\n" +
+                "Left Key: Move Left\n" +
+                "Right Key: Move Right\n" +
+                        "Down Key: Move Down\n" +
+                        "'n': New Game\n" +
+                        "'p': Pause Screen\n" +
+                        "'c': Exit Pause Screen\n" +
+                        "Esc: Close window","Controls", JOptionPane.INFORMATION_MESSAGE));
+        about.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Snake: version " + VERSION +
+                        "\nwritten by Joshua Torres.\n" +
+                        "Victoria College\n" +
+                        "COSC 1436 Spring 2017 Final Project\n"
+                , "About", JOptionPane.PLAIN_MESSAGE));
 
         // Add helpmenu elements
         helpMenu.add(howToPlay);
@@ -167,7 +144,7 @@ public class Board extends JPanel
         graphics2D.drawString("Snake", 50, 40);
 
         // Score box/text
-        graphics2D.setFont(font2);
+        graphics2D.setFont(font2.deriveFont(Font.BOLD));
         graphics2D.setColor(Color.RED);
         graphics2D.drawRect(49, 49, 501, 401);
         graphics2D.setColor(Color.BLACK);
@@ -175,38 +152,26 @@ public class Board extends JPanel
         graphics2D.drawRect(560, 50, 125, 40);
         graphics2D.drawString("Score: " + score, 565, 75);
 
-        // Pause screen
-        if(isPaused)
-        {
-            graphics2D.setFont(font2.deriveFont(Font.BOLD));
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("Paused - Press 'c' to continue",150,200);
-            gameSnake.snakeTimer.stop();
-        }
-        else
-        {
-            gameSnake.snakeTimer.restart();
-        }
-
         if(!gameStarted)
         {
             graphics2D.setFont(font2.deriveFont(Font.BOLD));
             graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("Press the up or down key to start!", 120, 200);
+            graphics2D.drawString("Press the Enter key to start!", 120, 200);
         }
         else
         {
-            gameSnake.snakeTimer.restart();
+            snake.snakeTimer.restart();
         }
 
         // Draw the snake
-        gameSnake.drawSnake(graphics2D);
+        snake.drawSnake(graphics2D);
 
         // Spawn the food
         spawnFood(graphics2D);
     }
 
-    private Action reDrawSnake = new AbstractAction() {
+    private Action reDrawSnake = new AbstractAction()
+    {
         public void actionPerformed(ActionEvent e) {
             repaint();
         }
@@ -214,6 +179,27 @@ public class Board extends JPanel
 
     public void spawnFood(Graphics g)
     {
+        if(foodEaten(x,y)) {
+            for(int i = 0; i < snake.getSize(); i++){
+                x = 10*(int)((50-5)*Math.random()+5);
+                //System.out.println(x);
+
+                y = 10*(int)((40-5)*Math.random()+5);
+                //System.out.println(y);
+
+                if(x == snake.xArray[i] && y == snake.yArray[i])
+                {
+                    x = 10*(int)((50-5)*Math.random()+5);
+                    //System.out.println(x);
+
+                    y = 10*(int)((40-5)*Math.random()+5);
+                    //System.out.println(y);
+
+                    i = 0;
+                }
+            }
+        }
+
         drawFood(x, y, g);
     }
 
@@ -222,6 +208,22 @@ public class Board extends JPanel
         Graphics2D graphics2D = (Graphics2D)g;
         graphics2D.setColor(Color.RED);
         graphics2D.fillOval(x, y, 10, 10);
+    }
+
+    // When the snake eats the food
+    public boolean foodEaten(int x, int y)
+    {
+        for(int i = 0; i < snake.getSize(); i++)
+        {
+            if(x == snake.xArray[i] && y == snake.yArray[i])
+            {
+                snake.updateSize();
+                score += 10;
+                System.out.println("Food eaten: " + x + " " + y);
+                return true;
+            }
+        }
+        return false;
     }
 
     //***************************************************************
@@ -240,56 +242,70 @@ public class Board extends JPanel
             switch(e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
                 {
-                    if(gameSnake.direction == 'a')
-                        break;
-                    if(gameSnake.direction != 'd') {
-                        gameSnake.snakeTimer.stop();
-                        gameSnake.direction = 'a';
-                        repaint();
-                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                        gameSnake.snakeTimer.start();
+                    if(gameStarted)
+                    {
+                        if(snake.direction == 'a')
+                            break;
+                        if(snake.direction != 'd')
+                        {
+                            snake.snakeTimer.stop();
+                            snake.direction = 'a';
+                            repaint();
+                            snake.snakeTimer = new Timer(speed, reDrawSnake);
+                            snake.snakeTimer.start();
+                        }
                     }
                     break;
                 }
 
                 case KeyEvent.VK_RIGHT:
                 {
-                    if(gameSnake.direction == 'd')
-                        break;
-                    if(gameSnake.direction != 'a') {
-                        gameSnake.snakeTimer.stop();
-                        gameSnake.direction = 'd';
-                        repaint();
-                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                        gameSnake.snakeTimer.start();
+                    if(gameStarted)
+                    {
+                        if(snake.direction == 'd')
+                            break;
+                        if(snake.direction != 'a')
+                        {
+                            snake.snakeTimer.stop();
+                            snake.direction = 'd';
+                            repaint();
+                            snake.snakeTimer = new Timer(speed, reDrawSnake);
+                            snake.snakeTimer.start();
+                        }
                     }
                     break;
                 }
 
                 case KeyEvent.VK_DOWN:
                 {
-                    if(gameSnake.direction == 's')
-                        break;
-                    if(gameSnake.direction != 'w') {
-                        gameSnake.snakeTimer.stop();
-                        gameSnake.direction = 's';
-                        repaint();
-                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                        gameSnake.snakeTimer.start();
+                    if(gameStarted)
+                    {
+                        if(snake.direction == 's')
+                            break;
+                        if(snake.direction != 'w') {
+                            snake.snakeTimer.stop();
+                            snake.direction = 's';
+                            repaint();
+                            snake.snakeTimer = new Timer(speed, reDrawSnake);
+                            snake.snakeTimer.start();
+                        }
                     }
                     break;
                 }
 
                 case KeyEvent.VK_UP:
                 {
-                    if(gameSnake.direction == 'w')
-                        break;
-                    if(gameSnake.direction != 's') {
-                        gameSnake.snakeTimer.stop();
-                        gameSnake.direction = 'w';
-                        repaint();
-                        gameSnake.snakeTimer = new Timer(speed, reDrawSnake);
-                        gameSnake.snakeTimer.start();
+                    if(gameStarted)
+                    {
+                        if(snake.direction == 'w')
+                            break;
+                        if(snake.direction != 's') {
+                            snake.snakeTimer.stop();
+                            snake.direction = 'w';
+                            repaint();
+                            snake.snakeTimer = new Timer(speed, reDrawSnake);
+                            snake.snakeTimer.start();
+                        }
                     }
                     break;
 
@@ -297,22 +313,8 @@ public class Board extends JPanel
 
                 case KeyEvent.VK_ENTER:
                 {
-                    gameSnake.direction = 'a';
+                    snake.direction = 's';
                     gameStarted = true;
-                    break;
-                }
-
-                // 'p' pressed, pause game
-                case KeyEvent.VK_P:
-                {
-                    isPaused = true;
-                    break;
-                }
-
-                // 'c' pressed, continue game
-                case KeyEvent.VK_C:
-                {
-                    isPaused = false;
                     repaint();
                     break;
                 }
