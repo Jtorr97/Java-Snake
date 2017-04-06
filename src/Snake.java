@@ -6,7 +6,7 @@
 import java.awt.*;
 import javax.swing.*;
 
-public class Snake implements Runnable
+public class Snake
 {
     // Direction snake moves
     char direction;
@@ -43,9 +43,6 @@ public class Snake implements Runnable
         yArray[1] = 240;
         yArray[2] = 230;
         yArray[3] = 220;
-
-        // Initial snake size
-        setSize(4);
     }
 
     public void setSize(int size)
@@ -76,7 +73,7 @@ public class Snake implements Runnable
 
                 final int PIXEL_WIDTH = 10;
                 final int PIXEL_HEIGHT = 10;
-                g.fillOval(xArray[i], yArray[i], PIXEL_WIDTH, PIXEL_HEIGHT);
+                g.fillRect(xArray[i], yArray[i], PIXEL_WIDTH, PIXEL_HEIGHT);
             }
         }
         else
@@ -178,11 +175,5 @@ public class Snake implements Runnable
             g2d.setColor(Color.WHITE);
             g2d.drawString("Press 'n' to play again", 205, 275);
         }
-    }
-
-    @Override
-    public void run()
-    {
-
     }
 }
