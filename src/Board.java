@@ -19,6 +19,9 @@ public class Board extends JPanel
     // InputHandler object
     private InputHandler inputHandler = new InputHandler();
 
+    // Food object
+    private Food food = new Food();
+
     // Custom fonts used for this program
     private Font font1;
     private Font font2;
@@ -27,10 +30,7 @@ public class Board extends JPanel
     private final int speed = 60;
 
     // The game score
-    private int score;
-
-    // Random x and y coordinates for the food spawn location
-    private int x = 10*(int)((50-5)*Math.random()+5), y =10*(int)((40-5)*Math.random()+5);
+    private static int score;
 
     // If the game has started or not
     private boolean gameStarted = false;
@@ -42,6 +42,9 @@ public class Board extends JPanel
     private Board()
     {
         initGUI();
+
+        // Initial snake size
+        snake.setSize(4);
 
         snake.snakeTimer = new Timer(speed, reDrawSnake);
     }
@@ -129,6 +132,11 @@ public class Board extends JPanel
         new Board();
     }
 
+    public static void updateScore()
+    {
+        score += 10;
+    }
+
     // Paint component
     public void paint(Graphics g)
     {
@@ -167,7 +175,7 @@ public class Board extends JPanel
         snake.drawSnake(graphics2D);
 
         // Spawn the food
-        spawnFood(graphics2D);
+        food.spawnFood(graphics2D, snake);
     }
 
     private Action reDrawSnake = new AbstractAction()
@@ -176,55 +184,6 @@ public class Board extends JPanel
             repaint();
         }
     };
-
-    public void spawnFood(Graphics g)
-    {
-        if(foodEaten(x,y)) {
-            for(int i = 0; i < snake.getSize(); i++){
-                x = 10*(int)((50-5)*Math.random()+5);
-                //System.out.println(x);
-
-                y = 10*(int)((40-5)*Math.random()+5);
-                //System.out.println(y);
-
-                if(x == snake.xArray[i] && y == snake.yArray[i])
-                {
-                    x = 10*(int)((50-5)*Math.random()+5);
-                    //System.out.println(x);
-
-                    y = 10*(int)((40-5)*Math.random()+5);
-                    //System.out.println(y);
-
-                    i = 0;
-                }
-            }
-        }
-
-        drawFood(x, y, g);
-    }
-
-    public void drawFood(int x, int y, Graphics g)
-    {
-        Graphics2D graphics2D = (Graphics2D)g;
-        graphics2D.setColor(Color.RED);
-        graphics2D.fillOval(x, y, 10, 10);
-    }
-
-    // When the snake eats the food
-    public boolean foodEaten(int x, int y)
-    {
-        for(int i = 0; i < snake.getSize(); i++)
-        {
-            if(x == snake.xArray[i] && y == snake.yArray[i])
-            {
-                snake.updateSize();
-                score += 10;
-                System.out.println("Food eaten: " + x + " " + y);
-                return true;
-            }
-        }
-        return false;
-    }
 
     //***************************************************************
     // Handle various input for the program
