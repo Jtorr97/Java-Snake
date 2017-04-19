@@ -81,6 +81,11 @@ public class Snake
         return DOWN;
     }
 
+    public void setGameOver(boolean gameOver)
+    {
+        this.gameOver = gameOver;
+    }
+
     public void updateSize()
     {
         size++;
@@ -170,12 +175,12 @@ public class Snake
 
             snakeTimer.stop();
             // Game over text
-            g2d.setFont(new Font("Arial Black", Font.BOLD, 40));
+            g2d.setFont(Window.getFont1());
             g2d.setStroke(new BasicStroke(3));
             g2d.setColor(Color.BLACK);
             g2d.fillRect(50,50,500,400);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(text, 174, 250);
+            g2d.drawString(text, 500/4, 500/2);
 
             // Try again text
             g2d.setFont(new Font("Arial",Font.PLAIN, 20));

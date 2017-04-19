@@ -16,7 +16,7 @@ public class Board extends JPanel
     private Food food = new Food();
 
     private final int speed = 50;
-
+    
     private static int playerScore;
 
     private boolean gameStarted = false;
@@ -44,7 +44,8 @@ public class Board extends JPanel
         {
             g2d.setFont(Window.getFont2().deriveFont(Font.BOLD));
             g2d.setColor(Color.WHITE);
-            g2d.drawString("Press the Enter key to start!", 120, 200);
+            g2d.drawString("Press the Enter key to start!", 500/4, 500/3);
+            snake.snakeTimer.stop();
         }
         else
         {
@@ -85,9 +86,25 @@ public class Board extends JPanel
         g2d.drawString("Score: " + playerScore, 565, 75);
     }
 
+    // Reset the snake, score, position and game status
     private void restartGame()
     {
-        // TODO: Implement game reset
+        playerScore = 0;
+        snake.direction = snake.getDownDirection();
+        snake.snakeTimer.start();
+        snake.setSize(4);
+        snake.setGameOver(false);
+        gameStarted = false;
+
+        snake.xArray[0] = 300;
+        snake.xArray[1] = 300;
+        snake.xArray[2] = 300;
+        snake.xArray[3] = 300;
+
+        snake.yArray[0] = 230;
+        snake.yArray[1] = 220;
+        snake.yArray[2] = 210;
+        snake.yArray[3] = 200;
     }
 
     public static void updateScore()
