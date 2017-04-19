@@ -27,7 +27,7 @@ public class Board extends JPanel
     private Font font2;
 
     // Speed of which the snakes moves at, lower = faster
-    private final int speed = 60;
+    private final int speed = 50;
 
     // The game score
     private static int score;
@@ -47,6 +47,47 @@ public class Board extends JPanel
         snake.setSize(4);
 
         snake.snakeTimer = new Timer(speed, reDrawSnake);
+    }
+
+    // Paint component
+    public void paint(Graphics g)
+    {
+        // The game board and window
+        Graphics2D graphics2D = (Graphics2D)g;
+        graphics2D.setStroke(new BasicStroke(3));
+        graphics2D.setColor(Color.white);
+        graphics2D.fillRect(0,0,700,500);
+
+        // Title text
+        graphics2D.setFont(font1);
+        graphics2D.setColor(Color.BLACK);
+        graphics2D.drawString("Snake", 50, 40);
+
+        // Score box/text
+        graphics2D.setFont(font2.deriveFont(Font.BOLD));
+        graphics2D.setColor(Color.RED);
+        graphics2D.drawRect(49, 49, 501, 401);
+        graphics2D.setColor(Color.BLACK);
+        graphics2D.fillRect(50, 50, 500, 400);
+        graphics2D.drawRect(560, 50, 125, 40);
+        graphics2D.drawString("Score: " + score, 565, 75);
+
+        if(!gameStarted)
+        {
+            graphics2D.setFont(font2.deriveFont(Font.BOLD));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString("Press the Enter key to start!", 120, 200);
+        }
+        else
+        {
+            snake.snakeTimer.restart();
+        }
+
+        // Draw the snake
+        snake.drawSnake(graphics2D);
+
+        // Spawn the food
+        food.spawnFood(graphics2D, snake);
     }
 
     // Initialize various elements for the game's GUI
@@ -137,45 +178,19 @@ public class Board extends JPanel
         score += 10;
     }
 
-    // Paint component
-    public void paint(Graphics g)
+    public void move(char inputDirection, char oppositeDirection)
     {
-        // The game board and window
-        Graphics2D graphics2D = (Graphics2D)g;
-        graphics2D.setStroke(new BasicStroke(3));
-        graphics2D.setColor(Color.white);
-        graphics2D.fillRect(0,0,700,500);
+        if(snake.direction == inputDirection)
+            inputDirection = inputDirection;
 
-        // Title text
-        graphics2D.setFont(font1);
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.drawString("Snake", 50, 40);
-
-        // Score box/text
-        graphics2D.setFont(font2.deriveFont(Font.BOLD));
-        graphics2D.setColor(Color.RED);
-        graphics2D.drawRect(49, 49, 501, 401);
-        graphics2D.setColor(Color.BLACK);
-        graphics2D.fillRect(50, 50, 500, 400);
-        graphics2D.drawRect(560, 50, 125, 40);
-        graphics2D.drawString("Score: " + score, 565, 75);
-
-        if(!gameStarted)
+        if(snake.direction != oppositeDirection)
         {
-            graphics2D.setFont(font2.deriveFont(Font.BOLD));
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("Press the Enter key to start!", 120, 200);
+            snake.snakeTimer.stop();
+            snake.direction = inputDirection;
+            repaint();
+            snake.snakeTimer = new Timer(speed, reDrawSnake);
+            snake.snakeTimer.start();
         }
-        else
-        {
-            snake.snakeTimer.restart();
-        }
-
-        // Draw the snake
-        snake.drawSnake(graphics2D);
-
-        // Spawn the food
-        food.spawnFood(graphics2D, snake);
     }
 
     private Action reDrawSnake = new AbstractAction()
@@ -198,81 +213,42 @@ public class Board extends JPanel
         public void keyPressed(KeyEvent e)
         {
             // Handle input: Use arrow keys to move the snake
+            if(gameStarted)
+            {
+                switch (e.getKeyCode())
+                {
+                    case KeyEvent.VK_LEFT:
+                    {
+                        move(snake.getLeftDirection(),snake.getRightDirection());
+                        break;
+                    }
+
+                    case KeyEvent.VK_RIGHT:
+                    {
+                        move(snake.getRightDirection(),snake.getLeftDirection());
+                        break;
+                    }
+
+                    case KeyEvent.VK_DOWN:
+                    {
+                        move(snake.getDownDirection(),snake.getUpDirection());
+                        break;
+                    }
+
+                    case KeyEvent.VK_UP:
+                    {
+                        move(snake.getUpDirection(),snake.getDownDirection());
+                        break;
+                    }
+                }
+            }
+
+            // Start the game
             switch(e.getKeyCode()) {
-                case KeyEvent.VK_LEFT:
-                {
-                    if(gameStarted)
-                    {
-                        if(snake.direction == 'a')
-                            break;
-                        if(snake.direction != 'd')
-                        {
-                            snake.snakeTimer.stop();
-                            snake.direction = 'a';
-                            repaint();
-                            snake.snakeTimer = new Timer(speed, reDrawSnake);
-                            snake.snakeTimer.start();
-                        }
-                    }
-                    break;
-                }
-
-                case KeyEvent.VK_RIGHT:
-                {
-                    if(gameStarted)
-                    {
-                        if(snake.direction == 'd')
-                            break;
-                        if(snake.direction != 'a')
-                        {
-                            snake.snakeTimer.stop();
-                            snake.direction = 'd';
-                            repaint();
-                            snake.snakeTimer = new Timer(speed, reDrawSnake);
-                            snake.snakeTimer.start();
-                        }
-                    }
-                    break;
-                }
-
-                case KeyEvent.VK_DOWN:
-                {
-                    if(gameStarted)
-                    {
-                        if(snake.direction == 's')
-                            break;
-                        if(snake.direction != 'w') {
-                            snake.snakeTimer.stop();
-                            snake.direction = 's';
-                            repaint();
-                            snake.snakeTimer = new Timer(speed, reDrawSnake);
-                            snake.snakeTimer.start();
-                        }
-                    }
-                    break;
-                }
-
-                case KeyEvent.VK_UP:
-                {
-                    if(gameStarted)
-                    {
-                        if(snake.direction == 'w')
-                            break;
-                        if(snake.direction != 's') {
-                            snake.snakeTimer.stop();
-                            snake.direction = 'w';
-                            repaint();
-                            snake.snakeTimer = new Timer(speed, reDrawSnake);
-                            snake.snakeTimer.start();
-                        }
-                    }
-                    break;
-
-                }
 
                 case KeyEvent.VK_ENTER:
                 {
-                    snake.direction = 's';
+                    snake.direction = snake.getDownDirection();
                     gameStarted = true;
                     repaint();
                     break;
@@ -284,6 +260,7 @@ public class Board extends JPanel
                     System.exit(0);
                 }
 
+                // New game/window
                 case KeyEvent.VK_N:
                 {
                     restartGame();

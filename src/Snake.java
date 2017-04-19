@@ -11,6 +11,12 @@ public class Snake
     // Direction snake moves
     char direction;
 
+    // Constants for each direction
+    private final char UP = 'w';
+    private final char DOWN = 's';
+    private final char LEFT = 'a';
+    private final char RIGHT = 'd';
+
     // Stores x and y coordinates
     public int[] xArray;
     public int[] yArray;
@@ -55,6 +61,26 @@ public class Snake
         return size;
     }
 
+    public char getLeftDirection()
+    {
+        return LEFT;
+    }
+
+    public char getRightDirection()
+    {
+        return RIGHT;
+    }
+
+    public char getUpDirection()
+    {
+        return UP;
+    }
+
+    public char getDownDirection()
+    {
+        return DOWN;
+    }
+
     public void updateSize()
     {
         size++;
@@ -69,8 +95,6 @@ public class Snake
             g.setColor(Color.GREEN);
             for(int i = 0; i < size; i++)
             {
-                //System.out.println("X pos: " + xArray[0] + " Y pos: " + yArray[0]);
-
                 final int PIXEL_WIDTH = 10;
                 final int PIXEL_HEIGHT = 10;
                 g.fillRect(xArray[i], yArray[i], PIXEL_WIDTH, PIXEL_HEIGHT);
@@ -83,7 +107,7 @@ public class Snake
     // Snake updated after each direction change
     public void updateSnake()
     {
-        if(direction == 'a')
+        if(direction == LEFT || direction == DOWN || direction == RIGHT || direction == UP)
         {
             for(int i = size - 1; i > 0; i--)
             {
@@ -91,40 +115,24 @@ public class Snake
                 yArray[i] = yArray[i - 1];
             }
 
-            xArray[0] -= 10;
-        }
-
-        if(direction == 's')
-        {
-            for(int i = size - 1; i > 0; i--)
-        {
-            xArray[i] = xArray[i - 1];
-            yArray[i] = yArray[i - 1];
-        }
-
-            yArray[0] += 10;
-        }
-
-        if(direction == 'd')
-        {
-            for(int i = size - 1; i > 0; i--)
+            switch (direction)
             {
-                xArray[i] = xArray[i - 1];
-                yArray[i] = yArray[i - 1];
+                case LEFT:
+                    xArray[0] -= 10;
+                    break;
+
+                case DOWN:
+                    yArray[0] += 10;
+                    break;
+
+                case RIGHT:
+                    xArray[0] += 10;
+                    break;
+
+                case UP:
+                    yArray[0] -= 10;
+                    break;
             }
-
-            xArray[0] += 10;
-        }
-
-        if(direction == 'w')
-        {
-            for(int i = size - 1; i > 0; i--)
-            {
-                xArray[i] = xArray[i - 1];
-                yArray[i] = yArray[i - 1];
-            }
-
-            yArray[0] -= 10;
         }
     }
 
