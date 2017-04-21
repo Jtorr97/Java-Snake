@@ -16,7 +16,7 @@ public class Board extends JPanel
     private Food food = new Food();
 
     private final int speed = 50;
-    
+
     private static int playerScore;
 
     private boolean gameStarted = false;
@@ -24,6 +24,10 @@ public class Board extends JPanel
     // Default constructor
     Board()
     {
+        // Init sounds
+        Sound.SoundEffect.init();
+        Sound.SoundEffect.volume = Sound.SoundEffect.Volume.LOW;
+
         Window.getGameFrame().addKeyListener(inputHandler);
 
         snake.setSize(4);
@@ -87,7 +91,7 @@ public class Board extends JPanel
     }
 
     // Reset the snake, score, position and game status
-    private void restartGame()
+    public void restartGame()
     {
         playerScore = 0;
         snake.direction = snake.getDownDirection();
@@ -96,15 +100,7 @@ public class Board extends JPanel
         snake.setGameOver(false);
         gameStarted = false;
 
-        snake.xArray[0] = 300;
-        snake.xArray[1] = 300;
-        snake.xArray[2] = 300;
-        snake.xArray[3] = 300;
-
-        snake.yArray[0] = 230;
-        snake.yArray[1] = 220;
-        snake.yArray[2] = 210;
-        snake.yArray[3] = 200;
+        snake.initalCoords();
     }
 
     public static void updateScore()
@@ -135,7 +131,7 @@ public class Board extends JPanel
     };
 
     //***************************************************************
-    // Handle various input for the program
+    // Inner class: Handle various input for the program
     //***************************************************************
 
     public class InputHandler implements KeyListener
@@ -182,6 +178,7 @@ public class Board extends JPanel
 
                 case KeyEvent.VK_ENTER:
                 {
+                    Sound.SoundEffect.GAMESTART.play();
                     snake.direction = snake.getDownDirection();
                     gameStarted = true;
                     repaint();
@@ -197,6 +194,7 @@ public class Board extends JPanel
                 // New game/window
                 case KeyEvent.VK_N:
                 {
+                    Sound.SoundEffect.GAMERESTART.play();
                     restartGame();
                     break;
                 }

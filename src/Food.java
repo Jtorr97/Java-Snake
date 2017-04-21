@@ -3,7 +3,6 @@
 // Food.java
 //
 
-
 import java.awt.*;
 
 public class Food
@@ -53,6 +52,7 @@ public class Food
                 snake.updateSize();
                 Board.updateScore();
                 System.out.println("Food eaten: " + foodX + " " + foodY);
+                Sound.SoundEffect.SCOREPOINT.play();
                 return true;
             }
         }
