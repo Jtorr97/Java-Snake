@@ -9,6 +9,57 @@ import javax.sound.sampled.*;
 
 public class Sound
 {
+    public enum Music
+    {
+        LEVEL_THEME("sounds/wyver9_Fast Level.wav");
+
+        // Nested class for specifying volume
+        public enum Volume
+        {
+            MUTE, PLAYING
+        }
+
+        public static Volume volume = Volume.PLAYING;
+
+        private Clip clip;
+
+        Music(String musicFileName)
+        {
+            try {
+                // Use URL (instead of File) to read from disk and JAR.
+                URL url = this.getClass().getClassLoader().getResource(musicFileName);
+
+                // Set up an audio input stream piped from the sound file.
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
+
+                // Get a clip resource.
+                clip = AudioSystem.getClip();
+
+                // Open audio clip and load samples from the audio input stream.
+                clip.open(audioInputStream);
+                FloatControl gainControl =
+                        (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(-20.0f); // Reduce volume by 20 decibels.
+            } catch (UnsupportedAudioFileException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void play()
+        {
+            if(volume != Music.Volume.MUTE) {
+                if(clip.isRunning())
+                    clip.stop();
+                clip.setFramePosition(0);
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                clip.start();
+            }
+        }
+    }
     public enum SoundEffect
     {
         COLLISION("sounds/sfx_sounds_negative1.wav"),
@@ -19,10 +70,10 @@ public class Sound
         // Nested class for specifying volume
         public enum Volume
         {
-            MUTE, LOW, MEDIUM, HIGH
+            MUTE, PLAYING
         }
 
-        public static Volume volume = Volume.LOW;
+        public static Volume volume = Volume.PLAYING;
 
         // Each sound effect has its own clip, loaded with its own sound file.
         private Clip clip;
@@ -42,6 +93,9 @@ public class Sound
 
                 // Open audio clip and load samples from the audio input stream.
                 clip.open(audioInputStream);
+                FloatControl gainControl =
+                        (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(-20.0f); // Reduce volume by 10 decibels.
             } catch (UnsupportedAudioFileException e) {
                 e.printStackTrace();
             } catch (IOException e) {

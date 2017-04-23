@@ -15,7 +15,7 @@ public class Board extends JPanel
 
     private Food food = new Food();
 
-    private final int speed = 50;
+    private final int SPEED = 45;
 
     private static int playerScore;
 
@@ -26,13 +26,14 @@ public class Board extends JPanel
     {
         // Init sounds
         Sound.SoundEffect.init();
-        Sound.SoundEffect.volume = Sound.SoundEffect.Volume.LOW;
-
+        Sound.SoundEffect.volume = Sound.SoundEffect.Volume.PLAYING;
+        Sound.Music.volume = Sound.Music.Volume.PLAYING;
+        Sound.Music.LEVEL_THEME.play();
         Window.getGameFrame().addKeyListener(inputHandler);
 
         snake.setSize(4);
 
-        snake.snakeTimer = new Timer(speed, reDrawSnake);
+        snake.snakeTimer = new Timer(SPEED, reDrawSnake);
     }
 
     // Paint component
@@ -118,7 +119,7 @@ public class Board extends JPanel
             snake.snakeTimer.stop();
             snake.direction = inputDirection;
             repaint();
-            snake.snakeTimer = new Timer(speed, reDrawSnake);
+            snake.snakeTimer = new Timer(SPEED, reDrawSnake);
             snake.snakeTimer.start();
         }
     }
@@ -174,7 +175,8 @@ public class Board extends JPanel
             }
 
             // Start the game
-            switch(e.getKeyCode()) {
+            switch(e.getKeyCode())
+            {
 
                 case KeyEvent.VK_ENTER:
                 {
@@ -188,6 +190,7 @@ public class Board extends JPanel
                 // Esc pressed to exit and close window
                 case KeyEvent.VK_ESCAPE:
                 {
+                    Sound.SoundEffect.GAMERESTART.play();
                     System.exit(0);
                 }
 
