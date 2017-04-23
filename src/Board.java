@@ -109,19 +109,13 @@ public class Board extends JPanel
         playerScore += 10;
     }
 
-    public void move(char inputDirection, char oppositeDirection)
+    public void move(char inputDirection)
     {
-        if(snake.direction == inputDirection)
-            inputDirection = inputDirection;
-
-        if(snake.direction != oppositeDirection)
-        {
-            snake.snakeTimer.stop();
-            snake.direction = inputDirection;
-            repaint();
-            snake.snakeTimer = new Timer(SPEED, reDrawSnake);
-            snake.snakeTimer.start();
-        }
+        snake.snakeTimer.stop();
+        snake.direction = inputDirection;
+        repaint();
+        snake.snakeTimer = new Timer(SPEED, reDrawSnake);
+        snake.snakeTimer.start();
     }
 
     private Action reDrawSnake = new AbstractAction()
@@ -150,25 +144,25 @@ public class Board extends JPanel
                 {
                     case KeyEvent.VK_LEFT:
                     {
-                        move(snake.getLeftDirection(),snake.getRightDirection());
+                        move(snake.getLeftDirection());
                         break;
                     }
 
                     case KeyEvent.VK_RIGHT:
                     {
-                        move(snake.getRightDirection(),snake.getLeftDirection());
+                        move(snake.getRightDirection());
                         break;
                     }
 
                     case KeyEvent.VK_DOWN:
                     {
-                        move(snake.getDownDirection(),snake.getUpDirection());
+                        move(snake.getDownDirection());
                         break;
                     }
 
                     case KeyEvent.VK_UP:
                     {
-                        move(snake.getUpDirection(),snake.getDownDirection());
+                        move(snake.getUpDirection());
                         break;
                     }
                 }
@@ -181,7 +175,7 @@ public class Board extends JPanel
                 case KeyEvent.VK_ENTER:
                 {
                     Sound.SoundEffect.GAMESTART.play();
-                    snake.direction = snake.getDownDirection();
+                    //snake.direction = snake.getDownDirection();
                     gameStarted = true;
                     repaint();
                     break;
