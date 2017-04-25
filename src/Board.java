@@ -11,11 +11,9 @@ public class Board extends JPanel
 {
     private volatile Snake snake = new Snake();
 
-    private InputHandler inputHandler = new InputHandler();
-
     private Food food = new Food();
 
-    private final int SPEED = 45;
+    private final int SPEED = 60;
 
     private static int playerScore;
 
@@ -24,11 +22,11 @@ public class Board extends JPanel
     // Default constructor
     Board()
     {
-        // Init sounds
+        Sound.Music.init();
         Sound.SoundEffect.init();
-        Sound.SoundEffect.volume = Sound.SoundEffect.Volume.PLAYING;
-        Sound.Music.volume = Sound.Music.Volume.PLAYING;
         Sound.Music.LEVEL_THEME.play();
+
+        InputHandler inputHandler = new InputHandler();
         Window.getGameFrame().addKeyListener(inputHandler);
 
         snake.setSize(4);
@@ -42,14 +40,15 @@ public class Board extends JPanel
         Graphics2D g2d = (Graphics2D)g;
 
         drawWindow(g);
+        drawBoard(g);
         drawTitle(g);
         drawScoreBox(g);
 
         if(!gameStarted)
         {
-            g2d.setFont(Window.getFont2().deriveFont(Font.BOLD));
+            g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(45f));
             g2d.setColor(Color.WHITE);
-            g2d.drawString("Press the Enter key to start!", 500/4, 500/3);
+            g2d.drawString("Press the Enter key to start!", 500/5, 500/3);
             snake.snakeTimer.stop();
         }
         else
@@ -61,11 +60,22 @@ public class Board extends JPanel
         food.spawnFood(g2d, snake);
     }
 
+    public void drawBoard(Graphics g)
+    {
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.setColor(Color.RED);
+        g2d.drawRect(49, 49, 501, 401);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(50, 50, 500, 400);
+
+
+    }
+
     public void drawWindow(Graphics g)
     {
         Graphics2D g2d = (Graphics2D)g;
         g2d.setStroke(new BasicStroke(3));
-        g2d.setColor(Color.white);
+        g2d.setColor(Color.BLACK);
         g2d.fillRect(0,0,700,500);
     }
 
@@ -74,7 +84,7 @@ public class Board extends JPanel
         // Title text
         Graphics2D g2d = (Graphics2D)g;
         g2d.setFont(Window.getFont1());
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(Color.white);
         g2d.drawString("Snake", 50, 40);
     }
 
@@ -83,11 +93,9 @@ public class Board extends JPanel
         // Score box/text
         Graphics2D g2d = (Graphics2D)g;
         g2d.setFont(Window.getFont2().deriveFont(Font.BOLD));
-        g2d.setColor(Color.RED);
-        g2d.drawRect(49, 49, 501, 401);
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(50, 50, 500, 400);
+        g2d.setColor(Color.red);
         g2d.drawRect(560, 50, 125, 40);
+        g2d.setColor(Color.WHITE);
         g2d.drawString("Score: " + playerScore, 565, 75);
     }
 
@@ -95,12 +103,12 @@ public class Board extends JPanel
     public void restartGame()
     {
         playerScore = 0;
-        snake.direction = snake.getDownDirection();
+        snake.setDirection(Snake.Direction.DOWN);
         snake.snakeTimer.start();
         snake.setSize(4);
         snake.setGameOver(false);
         gameStarted = false;
-
+        repaint();
         snake.initalCoords();
     }
 
@@ -109,13 +117,16 @@ public class Board extends JPanel
         playerScore += 10;
     }
 
-    public void move(char inputDirection)
+    public void move(Snake.Direction inputDirection)
     {
-        snake.snakeTimer.stop();
-        snake.direction = inputDirection;
-        repaint();
-        snake.snakeTimer = new Timer(SPEED, reDrawSnake);
-        snake.snakeTimer.start();
+        if(inputDirection != snake.headDirection.opposite())
+        {
+            snake.snakeTimer.stop();
+            snake.setDirection(inputDirection);
+            repaint();
+            snake.snakeTimer = new Timer(SPEED, reDrawSnake);
+            snake.snakeTimer.start();
+        }
     }
 
     private Action reDrawSnake = new AbstractAction()
@@ -144,25 +155,24 @@ public class Board extends JPanel
                 {
                     case KeyEvent.VK_LEFT:
                     {
-                        move(snake.getLeftDirection());
+                        move(Snake.Direction.LEFT);
                         break;
                     }
-
                     case KeyEvent.VK_RIGHT:
                     {
-                        move(snake.getRightDirection());
+                        move(Snake.Direction.RIGHT);
                         break;
                     }
 
                     case KeyEvent.VK_DOWN:
                     {
-                        move(snake.getDownDirection());
+                        move(Snake.Direction.DOWN);
                         break;
                     }
 
                     case KeyEvent.VK_UP:
                     {
-                        move(snake.getUpDirection());
+                        move(Snake.Direction.UP);
                         break;
                     }
                 }
@@ -174,8 +184,8 @@ public class Board extends JPanel
 
                 case KeyEvent.VK_ENTER:
                 {
-                    Sound.SoundEffect.GAMESTART.play();
-                    //snake.direction = snake.getDownDirection();
+                    Sound.SoundEffect.GAME_START.play();
+                    snake.setDirection(Snake.Direction.DOWN);
                     gameStarted = true;
                     repaint();
                     break;
@@ -184,14 +194,14 @@ public class Board extends JPanel
                 // Esc pressed to exit and close window
                 case KeyEvent.VK_ESCAPE:
                 {
-                    Sound.SoundEffect.GAMERESTART.play();
+                    Sound.SoundEffect.GAME_RESTART.play();
                     System.exit(0);
                 }
 
                 // New game/window
                 case KeyEvent.VK_N:
                 {
-                    Sound.SoundEffect.GAMERESTART.play();
+                    Sound.SoundEffect.GAME_RESTART.play();
                     restartGame();
                     break;
                 }

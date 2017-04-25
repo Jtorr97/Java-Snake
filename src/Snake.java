@@ -8,14 +8,32 @@ import javax.swing.*;
 
 public class Snake
 {
-    // Direction snake moves
-    char direction;
+    public enum Direction {
+        LEFT {
+            Direction opposite() {
+                return RIGHT;
+            }
+        },
+        RIGHT {
+            Direction opposite() {
+                return LEFT;
+            }
+        },
+        UP {
+            Direction opposite() {
+                return DOWN;
+            }
+        },
+        DOWN {
+            Direction opposite() {
+                return UP;
+            }
+        };
 
-    // Constants for each direction
-    private final char UP = 'w';
-    private final char DOWN = 's';
-    private final char LEFT = 'a';
-    private final char RIGHT = 'd';
+        abstract Direction opposite();
+    }
+
+    public Direction headDirection;
 
     private final int PIXEL_WIDTH = 10;
     private final int PIXEL_HEIGHT = 10;
@@ -79,7 +97,7 @@ public class Snake
     // Snake updated after each direction change
     public void updateSnake()
     {
-        if(direction == LEFT || direction == DOWN || direction == RIGHT || direction == UP)
+        if(headDirection == Direction.LEFT || headDirection == Direction.DOWN || headDirection == Direction.RIGHT || headDirection == Direction.UP)
         {
             for(int i = size - 1; i > 0; i--)
             {
@@ -87,7 +105,7 @@ public class Snake
                 yArray[i] = yArray[i - 1];
             }
 
-            switch (direction)
+            switch (headDirection)
             {
                 case LEFT:
                     xArray[0] -= 10;
@@ -164,24 +182,9 @@ public class Snake
         return size;
     }
 
-    public char getLeftDirection()
+    public void setDirection(Direction headDirection)
     {
-        return LEFT;
-    }
-
-    public char getRightDirection()
-    {
-        return RIGHT;
-    }
-
-    public char getUpDirection()
-    {
-        return UP;
-    }
-
-    public char getDownDirection()
-    {
-        return DOWN;
+        this.headDirection = headDirection;
     }
 
     public void setGameOver(boolean gameOver)
