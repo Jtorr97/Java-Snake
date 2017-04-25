@@ -40,7 +40,7 @@ public class Window
     {
         // Create the main window
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        gameFrame.setTitle("Snake");
+        gameFrame.setTitle("Snake Game");
         gameFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         gameFrame.setResizable(false);
         gameFrame.add(new Board());
@@ -62,8 +62,6 @@ public class Window
                         "Right Key: Move Right\n" +
                         "Down Key: Move Down\n" +
                         "'n': New Game\n" +
-                        "'p': Pause Screen\n" +
-                        "'c': Exit Pause Screen\n" +
                         "Esc: Close window","Controls", JOptionPane.INFORMATION_MESSAGE));
         about.addActionListener(e -> JOptionPane.showMessageDialog(gameFrame, "Snake: version " + VERSION +
                         "\nwritten by Joshua Torres.\n" +

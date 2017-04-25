@@ -13,14 +13,6 @@ public class Sound
     {
         LEVEL_THEME("sounds/wyver9_Fast Level.wav");
 
-        // Nested class for specifying volume
-        public enum Volume
-        {
-            MUTE, PLAYING
-        }
-
-        public static Volume volume = Volume.PLAYING;
-
         private Clip clip;
 
         Music(String musicFileName)
@@ -40,40 +32,34 @@ public class Sound
                 FloatControl gainControl =
                         (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
                 gainControl.setValue(-20.0f); // Reduce volume by 20 decibels.
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (LineUnavailableException e) {
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 e.printStackTrace();
             }
         }
 
         public void play()
         {
-            if(volume != Music.Volume.MUTE) {
-                if(clip.isRunning())
+            if(clip.isRunning())
                     clip.stop();
                 clip.setFramePosition(0);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
-            }
+
+        }
+
+        // Optional static method to pre-load all the sound files.
+        static void init()
+        {
+            values(); // calls the constructor for all the elements
         }
     }
+
     public enum SoundEffect
     {
         COLLISION("sounds/sfx_sounds_negative1.wav"),
-        SCOREPOINT("sounds/sfx_sounds_fanfare2.wav"),
-        GAMESTART("sounds/sfx_sounds_button2.wav"),
-        GAMERESTART("sounds/sfx_sounds_button5.wav");
-
-        // Nested class for specifying volume
-        public enum Volume
-        {
-            MUTE, PLAYING
-        }
-
-        public static Volume volume = Volume.PLAYING;
+        POINT_SCORED("sounds/sfx_sounds_fanfare2.wav"),
+        GAME_START("sounds/sfx_sounds_button2.wav"),
+        GAME_RESTART("sounds/sfx_sounds_button5.wav");
 
         // Each sound effect has its own clip, loaded with its own sound file.
         private Clip clip;
@@ -95,12 +81,8 @@ public class Sound
                 clip.open(audioInputStream);
                 FloatControl gainControl =
                         (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f); // Reduce volume by 10 decibels.
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (LineUnavailableException e) {
+                gainControl.setValue(-20.0f); // Reduce volume by 20 decibels.
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 e.printStackTrace();
             }
         }
@@ -108,12 +90,10 @@ public class Sound
         // Play or Re-play the sound effect from the beginning, by rewinding.
         public void play()
         {
-            if (volume != Volume.MUTE) {
-                if (clip.isRunning())
+            if (clip.isRunning())
                     clip.stop();   // Stop the player if it is still running
                 clip.setFramePosition(0); // rewind to the beginning
                 clip.start();     // Start playing
-            }
         }
 
         // Optional static method to pre-load all the sound files.

@@ -52,7 +52,7 @@ public class Food
                 snake.updateSize();
                 Board.updateScore();
                 System.out.println("Food eaten: " + foodX + " " + foodY);
-                Sound.SoundEffect.SCOREPOINT.play();
+                Sound.SoundEffect.POINT_SCORED.play();
                 return true;
             }
         }
