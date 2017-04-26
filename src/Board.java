@@ -9,21 +9,22 @@ import java.awt.*;
 
 public class Board extends JPanel
 {
-    private volatile Snake snake = new Snake();
-
+    private Snake snake = new Snake();
     private Food food = new Food();
-
     private final int SPEED = 60;
-
+    private final int BOARD_WIDTH = 500;
+    private final int BOARD_HEIGHT = 400;
     private static int playerScore;
-
     private boolean gameStarted = false;
+
+    private final int BOX_HEIGHT = 10;
+    private final int BOX_WIDTH = 10;
+    private final int GRID_WIDTH = 50;
+    private final int GRID_HEIGHT = 40;
 
     // Default constructor
     Board()
     {
-        Sound.Music.init();
-        Sound.SoundEffect.init();
         Sound.Music.LEVEL_THEME.play();
 
         InputHandler inputHandler = new InputHandler();
@@ -48,7 +49,7 @@ public class Board extends JPanel
         {
             g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(45f));
             g2d.setColor(Color.WHITE);
-            g2d.drawString("Press the Enter key to start!", 500/5, 500/3);
+            g2d.drawString("Press the Enter key to start!", BOARD_WIDTH/8, BOARD_HEIGHT/3);
             snake.snakeTimer.stop();
         }
         else
@@ -63,11 +64,26 @@ public class Board extends JPanel
     public void drawBoard(Graphics g)
     {
         Graphics2D g2d = (Graphics2D)g;
-        g2d.setColor(Color.RED);
-        g2d.drawRect(49, 49, 501, 401);
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(50, 50, 500, 400);
+        g2d.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
+        //drawing an outside rect
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.drawRect(0, 0, GRID_WIDTH * BOX_WIDTH, GRID_HEIGHT * BOX_HEIGHT);
+
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.setStroke(new BasicStroke(0.1f));
+        //drawing the vertical lines
+        for (int x = BOX_WIDTH; x < GRID_WIDTH * BOX_WIDTH; x += BOX_WIDTH)
+        {
+            g2d.drawLine(x, 0, x, BOX_HEIGHT * GRID_HEIGHT);
+        }
+
+        //drawing the horizontal lines
+        for (int y = BOX_HEIGHT; y < GRID_HEIGHT * BOX_HEIGHT; y += BOX_HEIGHT)
+        {
+            g2d.drawLine(0, y, GRID_WIDTH * BOX_WIDTH, y);
+        }
 
     }
 
@@ -76,7 +92,7 @@ public class Board extends JPanel
         Graphics2D g2d = (Graphics2D)g;
         g2d.setStroke(new BasicStroke(3));
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(0,0,700,500);
+        g2d.fillRect(0,0,Window.getWINDOW_WIDTH(),Window.getWINDOW_HEIGHT());
     }
 
     public void drawTitle(Graphics g)
@@ -84,19 +100,17 @@ public class Board extends JPanel
         // Title text
         Graphics2D g2d = (Graphics2D)g;
         g2d.setFont(Window.getFont1());
-        g2d.setColor(Color.white);
-        g2d.drawString("Snake", 50, 40);
+        g2d.setColor(Color.WHITE);
+        g2d.drawString("Snake", 525, 40);
     }
 
     public void drawScoreBox(Graphics g)
     {
         // Score box/text
         Graphics2D g2d = (Graphics2D)g;
-        g2d.setFont(Window.getFont2().deriveFont(Font.BOLD));
-        g2d.setColor(Color.red);
-        g2d.drawRect(560, 50, 125, 40);
+        g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(40f));
         g2d.setColor(Color.WHITE);
-        g2d.drawString("Score: " + playerScore, 565, 75);
+        g2d.drawString("Score: " + playerScore, 530, 75);
     }
 
     // Reset the snake, score, position and game status
