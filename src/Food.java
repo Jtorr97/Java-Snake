@@ -15,18 +15,14 @@ public class Food
         if(foodEaten(foodX, foodY, snake)) {
             for(int i = 0; i < snake.getSize(); i++){
                 foodX = 10*(int)((50-5)*Math.random()+5);
-                //System.out.println(x);
 
                 foodY = 10*(int)((40-5)*Math.random()+5);
-                //System.out.println(y);
 
                 if(foodX == snake.xArray[i] && foodY == snake.yArray[i])
                 {
                     foodX = 10*(int)((50-5)*Math.random()+5);
-                    //System.out.println(x);
 
                     foodY = 10*(int)((40-5)*Math.random()+5);
-                    //System.out.println(y);
 
                     i = 0;
                 }

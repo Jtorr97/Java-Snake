@@ -35,9 +35,6 @@ public class Snake
 
     public Direction headDirection;
 
-    private final int PIXEL_WIDTH = 10;
-    private final int PIXEL_HEIGHT = 10;
-
     // Stores x and y coordinates
     public int[] xArray;
     public int[] yArray;
@@ -65,16 +62,16 @@ public class Snake
     public void initalCoords()
     {
         // Initial X position
-        xArray[0] = 300;
-        xArray[1] = 300;
-        xArray[2] = 300;
-        xArray[3] = 300;
+        xArray[0] = 250;
+        xArray[1] = 250;
+        xArray[2] = 250;
+        xArray[3] = 250;
 
         // Initial Y position
-        yArray[0] = 250;
-        yArray[1] = 240;
-        yArray[2] = 230;
-        yArray[3] = 220;
+        yArray[0] = 220;
+        yArray[1] = 210;
+        yArray[2] = 200;
+        yArray[3] = 190;
     }
 
     // Draws the snake onto the screen
@@ -87,7 +84,8 @@ public class Snake
             g.setColor(Color.GREEN);
             for(int i = 0; i < size; i++)
             {
-                g.fillRect(xArray[i], yArray[i], PIXEL_WIDTH, PIXEL_HEIGHT);
+                System.out.println("X: " + xArray[0] + " " + "Y: " + yArray[0]);
+                g.fillRect(xArray[i], yArray[i], 10, 10);
             }
         }
         else
@@ -129,8 +127,8 @@ public class Snake
     // Collision checker
     public void checkCollision()
     {
-        // Left/Right wall OR Top/Bottom wall
-        if((xArray[0] > 540 || xArray[0] < 50) || (yArray[0] > 440 || yArray[0] < 50))
+        // (Left OR Right wall) OR (Top OR Bottom wall)
+        if((xArray[0] < 0 || xArray[0] > 490) || (yArray[0] < 0 || yArray[0] > 390))
             gameOver = true;
 
         // If the snake collides with itself
@@ -146,7 +144,7 @@ public class Snake
     {
         Graphics2D g2d = (Graphics2D)g;
         String text = "Game Over";
-        if(gameOver = true)
+        if(gameOver)
         {
             Sound.SoundEffect.COLLISION.play();
             try {
@@ -159,16 +157,14 @@ public class Snake
             // Game over text
             g2d.setFont(Window.getFont1());
             g2d.setStroke(new BasicStroke(3));
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(50,50,500,400);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(text, 500/4, 500/2);
+            g2d.drawString(text, 500/6, 400/2);
 
             // Try again text
             g2d.setFont(Window.getFont2());
             g2d.setStroke(new BasicStroke(1));
             g2d.setColor(Color.WHITE);
-            g2d.drawString("Press 'n' to play again", 205, 275);
+            g2d.drawString("Press 'n' to play again", 500/3, 220);
         }
     }
 

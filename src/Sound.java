@@ -46,12 +46,6 @@ public class Sound
                 clip.start();
 
         }
-
-        // Optional static method to pre-load all the sound files.
-        static void init()
-        {
-            values(); // calls the constructor for all the elements
-        }
     }
 
     public enum SoundEffect
@@ -94,12 +88,6 @@ public class Sound
                     clip.stop();   // Stop the player if it is still running
                 clip.setFramePosition(0); // rewind to the beginning
                 clip.start();     // Start playing
-        }
-
-        // Optional static method to pre-load all the sound files.
-        static void init()
-        {
-            values(); // calls the constructor for all the elements
         }
     }
 }

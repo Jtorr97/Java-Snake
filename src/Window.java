@@ -24,8 +24,8 @@ public class Window
     private final double VERSION = 1.0;
 
     // Window size
-    private final int WINDOW_WIDTH = 700;
-    private final int WINDOW_HEIGHT = 550;
+    private static final int WINDOW_WIDTH = 750;
+    private static final int WINDOW_HEIGHT = 500;
 
     // Custom fonts used for this program
     private static Font font1;
@@ -101,6 +101,16 @@ public class Window
     public static JFrame getGameFrame()
     {
         return gameFrame;
+    }
+
+    public static int getWINDOW_WIDTH()
+    {
+        return WINDOW_WIDTH;
+    }
+
+    public static int getWINDOW_HEIGHT()
+    {
+        return WINDOW_HEIGHT;
     }
 
     public static Font getFont1()
