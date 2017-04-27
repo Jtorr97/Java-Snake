@@ -11,16 +11,16 @@ public class Board extends JPanel
 {
     private Snake snake = new Snake();
     private Food food = new Food();
-    private final int SPEED = 60;
-    private final int BOARD_WIDTH = 500;
-    private final int BOARD_HEIGHT = 400;
+    private final int SPEED = 70;
+    private final int BOARD_WIDTH = 600;
+    private final int BOARD_HEIGHT = 600;
     private static int playerScore;
     private boolean gameStarted = false;
 
-    private final int BOX_HEIGHT = 10;
-    private final int BOX_WIDTH = 10;
-    private final int GRID_WIDTH = 50;
-    private final int GRID_HEIGHT = 40;
+    private final int BOX_HEIGHT = 20;
+    private final int BOX_WIDTH = 20;
+    private final int GRID_WIDTH = 30;
+    private final int GRID_HEIGHT = 30;
 
     // Default constructor
     Board()
@@ -47,7 +47,7 @@ public class Board extends JPanel
 
         if(!gameStarted)
         {
-            g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(45f));
+            g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(50f));
             g2d.setColor(Color.WHITE);
             g2d.drawString("Press the Enter key to start!", BOARD_WIDTH/8, BOARD_HEIGHT/3);
             snake.snakeTimer.stop();
@@ -101,16 +101,16 @@ public class Board extends JPanel
         Graphics2D g2d = (Graphics2D)g;
         g2d.setFont(Window.getFont1());
         g2d.setColor(Color.WHITE);
-        g2d.drawString("Snake", 525, 40);
+        g2d.drawString("Snake", 625, 40);
     }
 
     public void drawScoreBox(Graphics g)
     {
         // Score box/text
         Graphics2D g2d = (Graphics2D)g;
-        g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(40f));
+        g2d.setFont(Window.getFont2().deriveFont(Font.BOLD).deriveFont(50f));
         g2d.setColor(Color.WHITE);
-        g2d.drawString("Score: " + playerScore, 530, 75);
+        g2d.drawString("Score: " + playerScore, 625, 75);
     }
 
     // Reset the snake, score, position and game status

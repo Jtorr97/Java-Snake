@@ -24,8 +24,8 @@ public class Window
     private final double VERSION = 1.0;
 
     // Window size
-    private static final int WINDOW_WIDTH = 750;
-    private static final int WINDOW_HEIGHT = 500;
+    private static final int WINDOW_WIDTH = 850;
+    private static final int WINDOW_HEIGHT = 800;
 
     // Custom fonts used for this program
     private static Font font1;
