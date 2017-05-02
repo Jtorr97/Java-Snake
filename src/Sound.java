@@ -11,7 +11,7 @@ public class Sound
 {
     public enum Music
     {
-        LEVEL_THEME("sounds/wyver9_Fast Level.wav");
+        LEVEL_THEME("sounds/maintheme.wav");
 
         private Clip clip;
 
@@ -31,7 +31,7 @@ public class Sound
                 clip.open(audioInputStream);
                 FloatControl gainControl =
                         (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f); // Reduce volume by 20 decibels.
+                gainControl.setValue(-10.0f); // Reduce volume by 10 decibels.
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 e.printStackTrace();
             }
@@ -44,12 +44,18 @@ public class Sound
                 clip.setFramePosition(0);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
+        }
 
+        public void stop()
+        {
+            clip.stop();
         }
     }
 
     public enum SoundEffect
     {
+        NEW_HIGH_SCORE("sounds/newhighscore.wav"),
+        GAME_OVER("sounds/gameovertheme.wav"),
         COLLISION("sounds/sfx_sounds_negative1.wav"),
         POINT_SCORED("sounds/sfx_sounds_fanfare2.wav"),
         GAME_START("sounds/sfx_sounds_button2.wav"),
@@ -75,7 +81,7 @@ public class Sound
                 clip.open(audioInputStream);
                 FloatControl gainControl =
                         (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f); // Reduce volume by 20 decibels.
+                gainControl.setValue(-10.0f); // Reduce volume by 10 decibels.
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 e.printStackTrace();
             }
@@ -85,9 +91,14 @@ public class Sound
         public void play()
         {
             if (clip.isRunning())
-                    clip.stop();   // Stop the player if it is still running
-                clip.setFramePosition(0); // rewind to the beginning
-                clip.start();     // Start playing
+                    clip.stop();
+                clip.setFramePosition(0);
+                clip.start();
+        }
+
+        public void stop()
+        {
+            clip.stop();
         }
     }
 }

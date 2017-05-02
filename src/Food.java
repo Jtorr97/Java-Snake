@@ -4,34 +4,38 @@
 //
 
 import java.awt.*;
+import java.util.Random;
 
 public class Food
 {
-    // Random x and y coordinates for the food spawn location
-    private int foodX = 20*(int)((30-5)*Math.random()+5), foodY =20*(int)((30-5)*Math.random()+5);
+    // Random generator
+    private Random rng = new Random();
 
+    // Random x and y coordinates for the food spawn location
+    private int randomX =  20 * rng.nextInt(Board.getGRID_WIDTH());
+    private int randomY =  20 * rng.nextInt(Board.getGRID_HEIGHT());
+
+    // Creates the food
     public void spawnFood(Graphics g, Snake snake)
     {
-        System.out.println("Food X: " + foodX + " Food Y: " + foodY);
-        if(foodEaten(foodX, foodY, snake)) {
-            for(int i = 0; i < snake.getSize(); i++){
-                foodX = 20*(int)((30-5)*Math.random()+5);
+        if(foodEaten(randomX, randomY, snake)) {
+            for(int i = 0; i < snake.getSize(); i++)
+            {
+                randomX = 20 * rng.nextInt(Board.getGRID_WIDTH());
+                randomY = 20 * rng.nextInt(Board.getGRID_HEIGHT());
 
-                foodY = 20*(int)((30-5)*Math.random()+5);
-
-                if(foodX == snake.xArray[i] && foodY == snake.yArray[i])
+                if(randomX == snake.xPos[i] && randomY == snake.yPos[i])
                 {
-                    foodX = 20*(int)((30-5)*Math.random()+5);
-
-                    foodY = 20*(int)((30-5)*Math.random()+5);
-
+                    randomX = 20 * rng.nextInt(Board.getGRID_WIDTH());
+                    randomY = 20 * rng.nextInt(Board.getGRID_HEIGHT());
                     i = 0;
                 }
             }
         }
-        drawFood(foodX, foodY, g);
+        drawFood(randomX, randomY, g);
     }
 
+    // Draws the food
     public void drawFood(int foodX, int foodY, Graphics g)
     {
         Graphics2D graphics2D = (Graphics2D)g;
@@ -44,7 +48,7 @@ public class Food
     {
         for(int i = 0; i < snake.getSize(); i++)
         {
-            if(foodX == snake.xArray[i] && foodY == snake.yArray[i])
+            if(foodX == snake.xPos[i] && foodY == snake.yPos[i])
             {
                 snake.updateSize();
                 Board.updateScore();

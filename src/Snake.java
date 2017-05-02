@@ -8,39 +8,14 @@ import javax.swing.*;
 
 public class Snake
 {
-    public enum Direction {
-        LEFT {
-            Direction opposite() {
-                return RIGHT;
-            }
-        },
-        RIGHT {
-            Direction opposite() {
-                return LEFT;
-            }
-        },
-        UP {
-            Direction opposite() {
-                return DOWN;
-            }
-        },
-        DOWN {
-            Direction opposite() {
-                return UP;
-            }
-        };
+    private Direction direction = Direction.LEFT;
 
-        abstract Direction opposite();
-    }
-
-    public Direction headDirection;
-
-    // Stores x and y coordinates
-    public int[] xArray;
-    public int[] yArray;
+    // Stores x and y coordinates for the snake
+    public int[] xPos;
+    public int[] yPos;
 
     // Snake's size
-    private int size;
+    private int size = 4;
 
     // Max Snake size
     private int MAX_LENGTH = 560;
@@ -54,24 +29,24 @@ public class Snake
     // Default constructor
     Snake()
     {
-        xArray = new int[MAX_LENGTH];
-        yArray = new int[MAX_LENGTH];
-        initalCoords();
+        xPos = new int[MAX_LENGTH];
+        yPos = new int[MAX_LENGTH];
+        initCoordinates();
     }
 
-    public void initalCoords()
+    public void initCoordinates()
     {
         // Initial X position
-        xArray[0] = 300;
-        xArray[1] = 300;
-        xArray[2] = 300;
-        xArray[3] = 300;
+        xPos[0] = 300;
+        xPos[1] = 300;
+        xPos[2] = 300;
+        xPos[3] = 300;
 
         // Initial Y position
-        yArray[0] = 280;
-        yArray[1] = 260;
-        yArray[2] = 240;
-        yArray[3] = 220;
+        yPos[0] = 280;
+        yPos[1] = 260;
+        yPos[2] = 240;
+        yPos[3] = 220;
     }
 
     // Draws the snake onto the screen
@@ -84,57 +59,59 @@ public class Snake
             g.setColor(Color.GREEN);
             for(int i = 0; i < size; i++)
             {
-                System.out.println("X: " + xArray[0] + " " + "Y: " + yArray[0]);
-                g.fillRect(xArray[i], yArray[i], 20, 20);
+                g.fillRect(xPos[i], yPos[i], 20, 20);
             }
         }
         else
+        {
             gameOverScreen(g);
+        }
+
     }
 
     // Snake updated after each direction change
     public void updateSnake()
     {
-        if(headDirection == Direction.LEFT || headDirection == Direction.DOWN || headDirection == Direction.RIGHT || headDirection == Direction.UP)
-        {
+        assert (direction != null);
+
             for(int i = size - 1; i > 0; i--)
             {
-                xArray[i] = xArray[i - 1];
-                yArray[i] = yArray[i - 1];
+                xPos[i] = xPos[i - 1];
+                yPos[i] = yPos[i - 1];
             }
 
-            switch (headDirection)
+            switch (direction)
             {
                 case LEFT:
-                    xArray[0] -= 20;
+                    xPos[0] -= 20;
                     break;
 
                 case DOWN:
-                    yArray[0] += 20;
+                    yPos[0] += 20;
                     break;
 
                 case RIGHT:
-                    xArray[0] += 20;
+                    xPos[0] += 20;
                     break;
 
                 case UP:
-                    yArray[0] -= 20;
+                    yPos[0] -= 20;
                     break;
             }
-        }
+
     }
 
     // Collision checker
     public void checkCollision()
     {
         // (Left OR Right wall) OR (Top OR Bottom wall)
-        if((xArray[0] < 0 || xArray[0] > 580) || (yArray[0] < 0 || yArray[0] > 580))
+        if((xPos[0] < 0 || xPos[0] > 580) || (yPos[0] < 0 || yPos[0] > 580))
             gameOver = true;
 
         // If the snake collides with itself
         for(int i = 1; i < size; i++)
         {
-            if(xArray[0] == xArray[i] && yArray[0] == yArray[i])
+            if(xPos[0] == xPos[i] && yPos[0] == yPos[i])
                 gameOver = true;
         }
     }
@@ -146,12 +123,15 @@ public class Snake
         String text = "Game Over";
         if(gameOver)
         {
-            Sound.SoundEffect.COLLISION.play();
             try {
+                Sound.Music.LEVEL_THEME.stop();
+                Sound.SoundEffect.COLLISION.play();
+                Sound.SoundEffect.GAME_OVER.play();
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
 
             snakeTimer.stop();
             // Game over text
@@ -166,6 +146,13 @@ public class Snake
             g2d.setColor(Color.WHITE);
             g2d.drawString("Press 'n' to play again", 600/4, 600 - 370);
         }
+        Board.checkScore();
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setSize(int size)
@@ -178,9 +165,13 @@ public class Snake
         return size;
     }
 
-    public void setDirection(Direction headDirection)
+    public void setDirection(Direction newDirection)
     {
-        this.headDirection = headDirection;
+        assert(direction != null);
+        if (newDirection != direction.opposite())
+        {
+            direction = newDirection;
+        }
     }
 
     public void setGameOver(boolean gameOver)

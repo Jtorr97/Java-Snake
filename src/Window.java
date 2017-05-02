@@ -12,10 +12,9 @@ public class Window
     // Main gameframe
     private static JFrame gameFrame = new JFrame();
 
+    // Menu elements
     private JMenuBar bar = new JMenuBar();
     private JMenu helpMenu = new JMenu("Help");
-
-    // Various other buttons
     private JMenuItem howToPlay = new JMenuItem ("How to play");
     private JMenuItem controls = new JMenuItem("Controls");
     private JMenuItem about = new JMenuItem("About");
@@ -24,13 +23,14 @@ public class Window
     private final double VERSION = 1.0;
 
     // Window size
-    private static final int WINDOW_WIDTH = 850;
+    private static final int WINDOW_WIDTH = 900;
     private static final int WINDOW_HEIGHT = 800;
 
     // Custom fonts used for this program
     private static Font font1;
     private static Font font2;
 
+    // Main method
     public static void main(String[] args)
     {
         new Window();
